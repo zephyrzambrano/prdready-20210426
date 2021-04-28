@@ -19,11 +19,30 @@
 
   <name>Check In PAPI</name>
 
+  <properties>
+    <api.groupId>1c4a9a33-8bfa-4128-a36b-0f8a6a909044</api.groupId>
+    <api.artifactId>check-in-papi</api.artifactId>
+    <api.version>1.0.0</api.version>
+  </properties>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-clean-plugin</artifactId>
+      </plugin>
+      <plugin>
+        <groupId>org.mule.tools.maven</groupId>
+        <artifactId>mule-maven-plugin</artifactId>
+      </plugin>
+    </plugins>
+  </build>
+
   <dependencies>
     <dependency>
-      <groupId>1c4a9a33-8bfa-4128-a36b-0f8a6a909044</groupId>
-      <artifactId>check-in-papi</artifactId>
-      <version>1.0.0</version>
+      <groupId>${api.groupId}</groupId>
+      <artifactId>${api.artifactId}</artifactId>
+      <version>${api.version}</version>
       <classifier>oas</classifier>
       <type>zip</type>
     </dependency>
@@ -35,6 +54,11 @@
     <dependency>
       <groupId>org.mule.modules</groupId>
       <artifactId>mule-apikit-module</artifactId>
+      <classifier>mule-plugin</classifier>
+    </dependency>
+    <dependency>
+      <groupId>com.mulesoft.modules</groupId>
+      <artifactId>mule-secure-configuration-property-module</artifactId>
       <classifier>mule-plugin</classifier>
     </dependency>
   </dependencies>
