@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:munit="http://www.mulesoft.org/schema/mule/munit" xmlns:munit-tools="http://www.mulesoft.org/schema/mule/munit-tools"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xsi:schemaLocation="
+		http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+		http://www.mulesoft.org/schema/mule/munit http://www.mulesoft.org/schema/mule/munit/current/mule-munit.xsd
+		http://www.mulesoft.org/schema/mule/munit-tools  http://www.mulesoft.org/schema/mule/munit-tools/current/mule-munit-tools.xsd">
+	<munit:config name="flights-suite.xml" />
+  <munit:test name="flightsFlow-test" doc:id="a75a1c98-5871-485d-8d21-d602e0073f29" >
+    <munit:behavior >
+      <munit-tools:mock-when doc:name="Mock Select" doc:id="427e4a9f-ddb2-445d-aee6-52f56e6df082" processor="db:select">
+        <munit-tools:with-attributes >
+          <munit-tools:with-attribute whereValue="edcac7c3-7330-444b-a4d8-886c39b2694e" attributeName="doc:id" />
+        </munit-tools:with-attributes>
+        <munit-tools:then-return >
+          <munit-tools:payload value="#[output application/java --- readUrl('classpath://flightsFlowtest/mock_payload.dwl')]" mediaType="application/java" encoding="UTF-8" />
+        </munit-tools:then-return>
+      </munit-tools:mock-when>
+      <munit-tools:spy doc:name="Spy destination" doc:id="ffb874c8-b418-4333-bfb3-7585a0c939a6" processor="set-variable">
+        <munit-tools:with-attributes >
+          <munit-tools:with-attribute whereValue="c05186ef-e0af-4826-a0c9-03dbf247a6b2" attributeName="doc:id" />
+        </munit-tools:with-attributes>
+        <munit-tools:before-call >
+          <munit-tools:assert doc:name="Assert attributes" doc:id="640c1150-55b1-4992-9bde-06be43d090d9" message="The attributes do not match">
+            <munit-tools:that ><![CDATA[#[%dw 2.0
+import flightsFlowtest::spy_assert_attributes
+---
+spy_assert_attributes::main({payload: payload, attributes: attributes, vars: vars})]]]></munit-tools:that>
+          </munit-tools:assert>
+        </munit-tools:before-call>
+        <munit-tools:after-call >
+          <munit-tools:assert doc:name="Assert variables" doc:id="07fbc41d-52bd-4bab-b8ea-61a643634748" message="The variables do not match">
+            <munit-tools:that ><![CDATA[#[%dw 2.0
+import flightsFlowtest::spy_assert_variables
+---
+spy_assert_variables::main({payload: payload, attributes: attributes, vars: vars})]]]></munit-tools:that>
+          </munit-tools:assert>
+        </munit-tools:after-call>
+      </munit-tools:spy>
+      <munit:set-event doc:name="Set Input" doc:id="5b5fe7e7-1b6b-43b1-8609-c30229e5b49e" >
+        <munit:attributes value="#[readUrl('classpath://flightsFlowtest/set-event_attributes.dwl')]" />
+      </munit:set-event>
+    </munit:behavior>
+    <munit:execution >
+      <flow-ref doc:name="Flow-ref to flightsFlow" doc:id="bee49a35-9054-4782-8ab7-304e584bd1ea" name="flightsFlow"/>
+    </munit:execution>
+    <munit:validation >
+      <munit-tools:assert doc:name="Assert payload" doc:id="66c4bc8b-7cab-4a1d-8f64-c284f5dfb878" message="The payload does not match">
+        <munit-tools:that ><![CDATA[#[%dw 2.0
+import flightsFlowtest::assert_expression_payload
+---
+assert_expression_payload::main({payload: payload, attributes: attributes, vars: vars})]]]></munit-tools:that>
+      </munit-tools:assert>
+      <munit-tools:assert doc:name="Assert variables" doc:id="bca2f682-f4ee-4bb9-9989-f93e8498d52d" message="The variables do not match">
+        <munit-tools:that ><![CDATA[#[%dw 2.0
+import flightsFlowtest::assert_expression_variables
+---
+assert_expression_variables::main({payload: payload, attributes: attributes, vars: vars})]]]></munit-tools:that>
+      </munit-tools:assert>
+      <munit-tools:verify-call doc:name="Verify Transform Message" doc:id="e900a4f8-27d9-4f43-b3c6-76541e427405" processor="ee:transform" times="1">
+        <munit-tools:with-attributes >
+          <munit-tools:with-attribute whereValue="008b44b8-1133-49f0-b4d8-5f3bea0ca474" attributeName="doc:id" />
+        </munit-tools:with-attributes>
+      </munit-tools:verify-call>
+      <munit-tools:verify-call doc:name="Verify destination" doc:id="dc19b5c8-a0b7-4061-8018-28c73520b66e" processor="set-variable" times="1">
+        <munit-tools:with-attributes >
+          <munit-tools:with-attribute whereValue="c05186ef-e0af-4826-a0c9-03dbf247a6b2" attributeName="doc:id" />
+        </munit-tools:with-attributes>
+      </munit-tools:verify-call>
+    </munit:validation>
+  </munit:test>
+  <munit:test name="flights-suite-exceptional-path-test" doc:id="36252c84-0d65-4f6b-837c-129e3376a989" expectedErrorType="VALIDATION:MISMATCH">
+    <munit:behavior >
+      <munit:set-event doc:name="Set Input" doc:id="1294d03e-ff78-45dc-a17b-8f3ca426d892" >
+        <munit:attributes value="#[readUrl('classpath://flightsFlowExc/set-event_attributes.dwl')]" />
+      </munit:set-event>
+    </munit:behavior>
+    <munit:execution >
+      <flow-ref doc:name="Flow-ref to flightsFlow" doc:id="db202a4c-e0b1-47bb-aab8-96d64f168ef7" name="flightsFlow" />
+    </munit:execution>
+  </munit:test>
+
+</mule>

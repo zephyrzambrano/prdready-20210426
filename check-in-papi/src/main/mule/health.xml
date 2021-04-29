@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule
+  xmlns:http="http://www.mulesoft.org/schema/mule/http"
+  xmlns="http://www.mulesoft.org/schema/mule/core"
+  xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+
+  <import file="health-commons.xml" />
+
+  <sub-flow
+    name="check-dependencies-for-liveliness"
+    doc:id="33c0498d-0f5d-4dfa-acd0-9fb292e7e1ee">
+    <logger
+      level="INFO"
+      doc:name="Flights: GET /alive"
+      doc:id="a42e1a73-62e3-4b3e-b6e6-e01d18a1c4ef"
+      message="Flights: GET /alive" />
+    <logger
+      level="INFO"
+      doc:name="Passenger: GET /alive"
+      doc:id="dfc9319c-c262-42d1-9024-81e3b11a5324"
+      message="Passenger: GET /alive" />
+    <logger
+      level="INFO"
+      doc:name="Paypal: GET /alive"
+      doc:id="b83afd91-4323-431b-b680-7806f8981181"
+      message="Paypal: GET /alive" />
+  </sub-flow>
+</mule>

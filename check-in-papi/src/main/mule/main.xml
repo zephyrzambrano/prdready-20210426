@@ -1,15 +1,28 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <mule
+  xmlns:json-logger="http://www.mulesoft.org/schema/mule/json-logger"
   xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
   xmlns="http://www.mulesoft.org/schema/mule/core"
   xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
-  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
-http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/json-logger http://www.mulesoft.org/schema/mule/json-logger/current/mule-json-logger.xsd">
   <flow
     name="check-in-by-pnr"
     doc:id="7eb2a7fd-0934-4723-9ff2-d3abeaf4ca24">
+    <json-logger:logger doc:name="Start" doc:id="8717e4b3-b7cc-4794-8fc3-be5876c60e3f" config-ref="jsonLoggerConfig" message="Start check-in-by-pnr" tracePoint="FLOW">
+      <json-logger:content ><![CDATA[#[output application/json
+---
+{
+	p: payload,
+	a: attributes,
+	v: vars
+}]]]></json-logger:content>
+    </json-logger:logger>
+    <flow-ref doc:name="flights-call" doc:id="8fcff31a-9102-4e7d-b932-9df9c63511c1" name="flights-call"/>
+    <flow-ref doc:name="passenger-call" doc:id="4fba27b1-2219-41fb-a1b6-209172b20ca1" name="passenger-call"/>
+    <flow-ref doc:name="paypal-call" doc:id="eaf20007-0001-421a-9b5d-4c25275923ee" name="paypal-call"/>
     <ee:transform>
       <ee:message>
         <ee:set-payload><![CDATA[%dw 2.0
@@ -20,8 +33,18 @@ output application/json
 }]]></ee:set-payload>
       </ee:message>
     </ee:transform>
+    <json-logger:logger doc:name="End" doc:id="5c8c978d-c6ee-4765-93fc-4b9ec6bb331f" config-ref="jsonLoggerConfig" message="End check-in-by-pnr" tracePoint="FLOW"/>
   </flow>
-	<flow name="payment-approval-by-pnr" doc:id="9cb6efe0-3dae-4ca8-ae1c-5168d643ddec" >
+	<sub-flow name="flights-call" doc:id="87cb91b0-3c2e-471d-ae32-929a44c29e62" >
+    <logger level="INFO" doc:name="Logger" doc:id="c15d9080-cb00-4c49-b6bc-c2326d75ccc5" />
+  </sub-flow>
+  <sub-flow name="passenger-call" doc:id="0a9534ac-e1c1-42f4-bff8-fde829a959f5" >
+    <logger level="INFO" doc:name="Logger" doc:id="1a6a7c5f-efc0-4cfb-99c7-cab02276c12f" />
+  </sub-flow>
+  <sub-flow name="paypal-call" doc:id="d94ae30c-ff4a-4546-8bc3-a1ab096158f8" >
+    <logger level="INFO" doc:name="Logger" doc:id="6444e9d6-fb13-4644-91e7-14d040fc5f44" />
+  </sub-flow>
+  <flow name="payment-approval-by-pnr" doc:id="9cb6efe0-3dae-4ca8-ae1c-5168d643ddec" >
 		<ee:transform>
             <ee:message>
                 <ee:set-payload><![CDATA[%dw 2.0

@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule
+  xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+  xmlns:db="http://www.mulesoft.org/schema/mule/db"
+  xmlns:validation="http://www.mulesoft.org/schema/mule/validation"
+  xmlns:http="http://www.mulesoft.org/schema/mule/http"
+  xmlns="http://www.mulesoft.org/schema/mule/core"
+  xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/validation http://www.mulesoft.org/schema/mule/validation/current/mule-validation.xsd
+http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+  <flow
+    name="flightsFlow"
+    doc:id="c8f25d66-9ddb-4150-ad6f-4b2ad5aac5fa">
+    <http:listener
+      doc:name="GET /flights"
+      doc:id="4865714f-7750-4dc3-abac-141e2ddeea38"
+      config-ref="HTTP_Listener_config"
+      path="/flights"
+      allowedMethods="GET" />
+    <set-variable
+      value="#[attributes.queryParams.destination]"
+      doc:name="destination"
+      doc:id="c05186ef-e0af-4826-a0c9-03dbf247a6b2"
+      variableName="destination" />
+    <validation:matches-regex
+      doc:name="Matches regex"
+      doc:id="712af71d-74c4-4d99-8059-1d99a4fabc95"
+      value="#[vars.destination]"
+      regex="^(SFO|LAX|CLE)$" />
+    <db:select
+      doc:name="Select"
+      doc:id="edcac7c3-7330-444b-a4d8-886c39b2694e"
+      config-ref="Database_Config">
+      <db:sql><![CDATA[SELECT * FROM american WHERE toAirport = :dest]]></db:sql>
+      <db:input-parameters><![CDATA[#[dest: vars.destination]]]></db:input-parameters>
+    </db:select>
+    <ee:transform
+      doc:name="Transform Message"
+      doc:id="008b44b8-1133-49f0-b4d8-5f3bea0ca474">
+      <ee:message>
+        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+      </ee:message>
+    </ee:transform>
+    <logger
+      level="INFO"
+      doc:name="Logger"
+      doc:id="336d4fba-5e6f-4582-b5ea-2fe59c740a70" />
+  </flow>
+</mule>

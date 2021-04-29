@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+  <flow name="liveliness-check" doc:id="ea648ef6-49e0-4806-947c-c8be0b8f127d" >
+    <http:listener doc:name="GET /alive" doc:id="4531f407-4241-495f-b741-72481ee38cad" config-ref="apiHttpListenerConfig" path="/alive" allowedMethods="GET">
+      <http:response >
+        <http:body ><![CDATA[UP]]></http:body>
+      </http:response>
+      <http:error-response >
+        <http:body ><![CDATA[DOWN]]></http:body>
+      </http:error-response>
+    </http:listener>
+    <logger level="INFO" doc:name="Logger" doc:id="d885aaba-2708-474e-a2d8-46be9f123d73" />
+  </flow>
+  <flow name="readiness-check" doc:id="b47c9b78-2fac-4a78-b7d7-212126874ba7" >
+    <http:listener doc:name="GET /ready" doc:id="2ff67e0d-82dd-46dd-bc86-1ffb464966a0" config-ref="apiHttpListenerConfig" path="/ready" allowedMethods="GET">
+      <http:response >
+        <http:body ><![CDATA[UP]]></http:body>
+      </http:response>
+      <http:error-response >
+        <http:body ><![CDATA[DOWN]]></http:body>
+      </http:error-response>
+    </http:listener>
+    <flow-ref doc:name="check-dependencies-for-liveliness" doc:id="a2acc3d4-7fc7-4bea-9751-bf24e0766516" name="check-dependencies-for-liveliness"/>
+    <logger level="INFO" doc:name="Logger" doc:id="b0c1601a-0391-4656-8b97-61d890b1dca3" />
+  </flow>
+</mule>
